@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2018 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -97,7 +97,7 @@ namespace dnSpy.AsmEditor.Compiler {
 
 		public static Metadata TryCreateMetadata(RawModuleBytes moduleData, bool isFileLayout) {
 			try {
-				return MetadataCreator.CreateMetadata(new PEImage((IntPtr)moduleData.Pointer, (uint)moduleData.Size, isFileLayout ? ImageLayout.File : ImageLayout.Memory, verify: true));
+				return MetadataFactory.CreateMetadata(new PEImage((IntPtr)moduleData.Pointer, (uint)moduleData.Size, isFileLayout ? ImageLayout.File : ImageLayout.Memory, verify: true));
 			}
 			catch (IOException) {
 			}

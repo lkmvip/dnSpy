@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2018 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -145,7 +145,7 @@ namespace dnSpy.AsmEditor.Compiler {
 		protected readonly ModuleDef sourceModule;
 		readonly AssemblyNameInfo tempAssembly;
 
-		protected EditCodeVM(in EditCodeVMOptions options, TypeDef typeToEditOrNull) {
+		protected EditCodeVM(EditCodeVMOptions options, TypeDef typeToEditOrNull) {
 			Debug.Assert(options.Decompiler.CanDecompile(DecompilationType.TypeMethods));
 			openFromGAC = options.OpenFromGAC;
 			openAssembly = options.OpenAssembly;
@@ -449,8 +449,10 @@ namespace dnSpy.AsmEditor.Compiler {
 				compilerDiagnostics = new CompilerDiagnostic[] { ToCompilerDiagnostic(caughtException) };
 			}
 			else if (result?.Success == true) {
+				ModuleImporterAssemblyResolver asmResolver = null;
 				try {
-					importer = new ModuleImporter(sourceModule);
+					asmResolver = new ModuleImporterAssemblyResolver(assemblyReferenceResolver.GetReferences());
+					importer = new ModuleImporter(sourceModule, asmResolver);
 					Import(importer, result.Value);
 					compilerDiagnostics = importer.Diagnostics;
 					if (compilerDiagnostics.Any(a => a.Severity == CompilerDiagnosticSeverity.Error))
@@ -464,6 +466,9 @@ namespace dnSpy.AsmEditor.Compiler {
 				catch (Exception ex) {
 					compilerDiagnostics = new CompilerDiagnostic[] { ToCompilerDiagnostic(ex) };
 					importer = null;
+				}
+				finally {
+					asmResolver?.Dispose();
 				}
 			}
 
@@ -482,7 +487,7 @@ namespace dnSpy.AsmEditor.Compiler {
 			CommandManager.InvalidateRequerySuggested();
 		}
 
-		protected abstract void Import(ModuleImporter importer, in CompilationResult result);
+		protected abstract void Import(ModuleImporter importer, CompilationResult result);
 
 		static CompilerDiagnostic ToCompilerDiagnostic(Exception ex) =>
 			new CompilerDiagnostic(CompilerDiagnosticSeverity.Error, $"Exception: {ex.GetType()}: {ex.Message}", "DSBUG1", null, null, null);

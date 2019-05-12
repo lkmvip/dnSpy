@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2018 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -55,7 +55,7 @@ namespace dnSpy.Decompiler.MSBuild {
 			if (iconDir == null)
 				return null;
 
-			var reader = dir.Data[0].GetReader();
+			var reader = dir.Data[0].CreateReader();
 			var iconData = TryCreateIcon(ref reader, iconDir);
 			if (iconData == null)
 				return null;
@@ -105,7 +105,7 @@ namespace dnSpy.Decompiler.MSBuild {
 					var d = iconDir.Directories.FirstOrDefault(a => a.Name == new ResourceName(e.nID));
 					if (d == null || d.Data.Count == 0)
 						return null;
-					var r = d.Data[0].GetReader();
+					var r = d.Data[0].CreateReader();
 					Debug.Assert(r.Length == e.dwBytesInRes);
 					if (r.Length < e.dwBytesInRes)
 						return null;

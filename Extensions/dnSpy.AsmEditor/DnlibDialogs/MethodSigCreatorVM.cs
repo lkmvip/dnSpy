@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2018 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -69,7 +69,7 @@ namespace dnSpy.AsmEditor.DnlibDialogs {
 				var sig = MethodBaseSig;
 				if (sig.GenParamCount > 100)
 					sig.GenParamCount = 100;
-				return FullNameCreator.MethodBaseSigFullName(null, null, sig, options.TypeSigCreatorOptions.OwnerMethod, null);
+				return FullNameFactory.MethodBaseSigFullName(null, null, sig, options.TypeSigCreatorOptions.OwnerMethod, null);
 			}
 		}
 

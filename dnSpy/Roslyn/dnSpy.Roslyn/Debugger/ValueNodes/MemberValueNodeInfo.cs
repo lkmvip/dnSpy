@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2018 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -24,12 +24,14 @@ using dnSpy.Debugger.DotNet.Metadata;
 
 namespace dnSpy.Roslyn.Debugger.ValueNodes {
 	readonly struct MemberValueNodeInfoCollection {
-		public static readonly MemberValueNodeInfoCollection Empty = new MemberValueNodeInfoCollection(Array.Empty<MemberValueNodeInfo>(), false);
+		public static readonly MemberValueNodeInfoCollection Empty = new MemberValueNodeInfoCollection(Array.Empty<MemberValueNodeInfo>(), false, false);
 		public readonly MemberValueNodeInfo[] Members;
 		public readonly bool HasHideRoot;
-		public MemberValueNodeInfoCollection(MemberValueNodeInfo[] members, bool hasHideRoot) {
+		public readonly bool HasShowNever;
+		public MemberValueNodeInfoCollection(MemberValueNodeInfo[] members, bool hasHideRoot, bool hasShowNever) {
 			Members = members;
 			HasHideRoot = hasHideRoot;
+			HasShowNever = hasShowNever;
 		}
 	}
 
@@ -93,7 +95,7 @@ namespace dnSpy.Roslyn.Debugger.ValueNodes {
 						if (ca.ConstructorArguments.Count == 1) {
 							var arg = ca.ConstructorArguments[0];
 							if (arg.Value is int) {
-								flags = flags & ~MemberValueNodeInfoFlags.DebuggerBrowsableState_Mask;
+								flags &= ~MemberValueNodeInfoFlags.DebuggerBrowsableState_Mask;
 								switch ((DebuggerBrowsableState)(int)arg.Value) {
 								case DebuggerBrowsableState.Never:
 									flags |= MemberValueNodeInfoFlags.DebuggerBrowsableState_Never;

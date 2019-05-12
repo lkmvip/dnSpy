@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2018 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -19,13 +19,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using dnSpy.Contracts.Debugger;
 using dnSpy.Contracts.Debugger.DotNet.Evaluation;
 using dnSpy.Contracts.Debugger.DotNet.Evaluation.ValueNodes;
 using dnSpy.Contracts.Debugger.DotNet.Text;
 using dnSpy.Contracts.Debugger.Evaluation;
-using dnSpy.Contracts.Text;
+using dnSpy.Contracts.Debugger.Text;
 using dnSpy.Debugger.DotNet.Metadata;
 
 namespace dnSpy.Roslyn.Debugger.ValueNodes {
@@ -34,7 +35,7 @@ namespace dnSpy.Roslyn.Debugger.ValueNodes {
 		public override string Expression => nodeInfo.Expression;
 		public override string ImageName => PredefinedDbgValueNodeImageNames.Structure;
 		public override bool? HasChildren => tupleFields.Length > 0;
-		static readonly DbgDotNetText tupleName = new DbgDotNetText(new DbgDotNetTextPart(BoxedTextColor.Punctuation, "()"));
+		static readonly DbgDotNetText tupleName = new DbgDotNetText(new DbgDotNetTextPart(DbgTextColor.Punctuation, "()"));
 
 		readonly bool addParens;
 		readonly DmdType slotType;
@@ -50,7 +51,7 @@ namespace dnSpy.Roslyn.Debugger.ValueNodes {
 
 		public override ulong GetChildCount(DbgEvaluationInfo evalInfo) => (uint)tupleFields.Length;
 
-		public override DbgDotNetValueNode[] GetChildren(LanguageValueNodeFactory valueNodeFactory, DbgEvaluationInfo evalInfo, ulong index, int count, DbgValueNodeEvaluationOptions options) {
+		public override DbgDotNetValueNode[] GetChildren(LanguageValueNodeFactory valueNodeFactory, DbgEvaluationInfo evalInfo, ulong index, int count, DbgValueNodeEvaluationOptions options, ReadOnlyCollection<string> formatSpecifiers) {
 			var runtime = evalInfo.Runtime.GetDotNetRuntime();
 			var res = count == 0 ? Array.Empty<DbgDotNetValueNode>() : new DbgDotNetValueNode[count];
 			var valueResults = new List<DbgDotNetValueResult>();
@@ -88,14 +89,14 @@ namespace dnSpy.Roslyn.Debugger.ValueNodes {
 						valueResult = default;
 					}
 
-					var name = new DbgDotNetText(new DbgDotNetTextPart(BoxedTextColor.InstanceField, info.DefaultName));
+					var name = new DbgDotNetText(new DbgDotNetTextPart(DbgTextColor.InstanceField, info.DefaultName));
 					DbgDotNetValueNode newNode;
 					if (errorMessage != null)
 						newNode = valueNodeFactory.CreateError(evalInfo, name, errorMessage, expression, false);
 					else if (valueIsException)
-						newNode = valueNodeFactory.Create(evalInfo, name, objValue, null, options, expression, PredefinedDbgValueNodeImageNames.Error, true, false, expectedType, false);
+						newNode = valueNodeFactory.Create(evalInfo, name, objValue, formatSpecifiers, options, expression, PredefinedDbgValueNodeImageNames.Error, true, false, expectedType, false);
 					else
-						newNode = valueNodeFactory.Create(evalInfo, name, objValue, null, options, expression, imageName, isReadOnly, false, expectedType, false);
+						newNode = valueNodeFactory.Create(evalInfo, name, objValue, formatSpecifiers, options, expression, imageName, isReadOnly, false, expectedType, false);
 
 					foreach (var vr in valueResults)
 						vr.Value?.Dispose();

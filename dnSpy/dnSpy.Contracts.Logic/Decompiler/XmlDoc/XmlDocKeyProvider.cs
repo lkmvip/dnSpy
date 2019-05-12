@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2011 AlphaSierraPapa for the SharpDevelop Team
+// Copyright (c) 2011 AlphaSierraPapa for the SharpDevelop Team
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this
 // software and associated documentation files (the "Software"), to deal in the Software
@@ -166,7 +166,7 @@ namespace dnSpy.Contracts.Decompiler.XmlDoc {
 					b.Append(typeRef.Name);
 				}
 				else {
-					FullNameCreator.FullNameSB(type, false, null, null, null, b);
+					FullNameFactory.FullNameSB(type, false, null, null, null, b);
 				}
 			}
 		}
@@ -182,7 +182,7 @@ namespace dnSpy.Contracts.Decompiler.XmlDoc {
 			}
 			else {
 				int len = b.Length;
-				FullNameCreator.NamespaceSB(type, true, b);
+				FullNameFactory.NamespaceSB(type, true, b);
 				if (len != b.Length)
 					b.Append('.');
 			}

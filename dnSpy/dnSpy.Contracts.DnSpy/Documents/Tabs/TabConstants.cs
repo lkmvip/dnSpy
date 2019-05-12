@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2018 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -56,16 +56,6 @@ namespace dnSpy.Contracts.Documents.Tabs {
 		/// Order of dnlib reference <see cref="IDocumentViewerToolTipProvider"/> instance
 		/// </summary>
 		public const double ORDER_DNLIBREFTOOLTIPCONTENTPROVIDER = double.MaxValue;
-
-		/// <summary>
-		/// Order of default <see cref="ITabSaverProvider"/> instance
-		/// </summary>
-		public const double ORDER_DEFAULTTABSAVERPROVIDER = double.MaxValue;
-
-		/// <summary>
-		/// Order of baml <see cref="ITabSaverProvider"/> instance
-		/// </summary>
-		public const double ORDER_BAMLTABSAVERPROVIDER = 1000;
 
 		/// <summary>
 		/// Order of hex <see cref="ITabSaverProvider"/> instance

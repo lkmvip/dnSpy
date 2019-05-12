@@ -1,5 +1,5 @@
-﻿<!--
-    Copyright (C) 2014-2018 de4dot@gmail.com
+<!--
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -23,7 +23,8 @@
              xmlns:winlocal="clr-namespace:dnSpy.Contracts.Controls;assembly=dnSpy.Contracts.DnSpy"
              xmlns:mvvmvc="clr-namespace:dnSpy.Contracts.MVVM.Converters;assembly=dnSpy.Contracts.DnSpy"
              xmlns:p="clr-namespace:dnSpy.AsmEditor.Properties"
-             Height="400" Width="450"
+             xmlns:img="clr-namespace:dnSpy.Contracts.Images;assembly=dnSpy.Contracts.DnSpy"
+             Height="450" Width="500"
              Title="{x:Static p:dnSpy_AsmEditor_Resources.SaveModuleCommand2}"
              Style="{StaticResource DialogWindowStyle}" WindowStartupLocation="CenterOwner"
              MinHeight="410" MinWidth="400">
@@ -39,7 +40,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <TabControl Margin="5">
-            <TabItem Header="{x:Static p:dnSpy_AsmEditor_Resources.MainTab}">
+            <TabItem Header="{x:Static p:dnSpy_AsmEditor_Resources.MainTab}" img:DsImage.BackgroundBrush="{DynamicResource TabItem.Selected.Background}">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
                     <StackPanel>
                         <Grid>
@@ -75,6 +76,11 @@
                             <TextBox Grid.Row="0" Grid.Column="1" Margin="5 0 0 0" Name="filenameTextBox" Text="{Binding FileName, ValidatesOnDataErrors=True, ValidatesOnExceptions=True, UpdateSourceTrigger=PropertyChanged}" />
                             <Button Grid.Row="0" Grid.Column="2" Margin="5 0 0 0" Style="{StaticResource EllipsisButton}" Command="{Binding PickNetExecutableFileNameCommand}" />
                         </Grid>
+
+                        <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal" Margin="5 5 0 0">
+                            <img:DsImage ImageReference="{x:Static img:DsImages.StatusWarning}"/>
+                            <TextBlock Margin="5 0 0 0" Text="{x:Static p:dnSpy_AsmEditor_Resources.RerunNgenIfGacAssembly}" />
+                        </StackPanel>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
@@ -149,13 +155,15 @@
                             <Grid>
                                 <Grid.RowDefinitions>
                                     <RowDefinition />
+                                    <RowDefinition />
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition />
                                     <ColumnDefinition />
                                 </Grid.ColumnDefinitions>
-                                <CheckBox Grid.Column="0" Margin="0 0 0 0" Content="{x:Static p:dnSpy_AsmEditor_Resources.SaveModule_PreserveExtraSigData}" IsChecked="{Binding MetadataOptions.PreserveExtraSignatureData}" ToolTip="{x:Static p:dnSpy_AsmEditor_Resources.SaveModule_PreserveExtraSigData_ToolTip}" IsEnabled="{Binding CanSaveMixedModeModule}" />
-                                <CheckBox Grid.Column="1" Margin="5 0 0 0" Content="{x:Static p:dnSpy_AsmEditor_Resources.SaveModule_KeepOldMaxStack}" IsChecked="{Binding MetadataOptions.KeepOldMaxStack}" ToolTip="{x:Static p:dnSpy_AsmEditor_Resources.SaveModule_KeepOldMaxStack_ToolTip}" />
+                                <CheckBox Grid.Row="0" Grid.Column="0" Margin="0 0 0 0" Content="{x:Static p:dnSpy_AsmEditor_Resources.SaveModule_PreserveExtraSigData}" IsChecked="{Binding MetadataOptions.PreserveExtraSignatureData}" ToolTip="{x:Static p:dnSpy_AsmEditor_Resources.SaveModule_PreserveExtraSigData_ToolTip}" IsEnabled="{Binding CanSaveMixedModeModule}" />
+                                <CheckBox Grid.Row="0" Grid.Column="1" Margin="5 0 0 0" Content="{x:Static p:dnSpy_AsmEditor_Resources.SaveModule_KeepOldMaxStack}" IsChecked="{Binding MetadataOptions.KeepOldMaxStack}" ToolTip="{x:Static p:dnSpy_AsmEditor_Resources.SaveModule_KeepOldMaxStack_ToolTip}" />
+                                <CheckBox Grid.Row="1" Grid.Column="0" Margin="0 5 0 0" Content="{x:Static p:dnSpy_AsmEditor_Resources.SaveModule_PreserveOtherMetadataStreams}" IsChecked="{Binding MetadataOptions.PreserveOtherMetadataStreams}" IsEnabled="{Binding CanPreserveOtherMetadataStreams}" />
                             </Grid>
                         </GroupBox>
                     </StackPanel>
@@ -259,12 +267,12 @@
                                     <ColumnDefinition />
                                     <ColumnDefinition />
                                 </Grid.ColumnDefinitions>
-                                <CheckBox Grid.Row="0" Grid.Column="0" Margin="0 0 0 0" IsThreeState="True" IsChecked="{Binding Cor20HeaderOptions.ILOnly}" Content="{x:Static p:dnSpy_AsmEditor_Resources.SaveModule_Cor20_Flags_ILOnly}" />
-                                <CheckBox Grid.Row="0" Grid.Column="1" Margin="5 0 0 0" IsThreeState="True" IsChecked="{Binding Cor20HeaderOptions.ILLibrary}" Content="{x:Static p:dnSpy_AsmEditor_Resources.SaveModule_Cor20_Flags_ILLibrary}" />
-                                <CheckBox Grid.Row="1" Grid.Column="0" Margin="0 5 0 0" IsThreeState="True" IsChecked="{Binding Cor20HeaderOptions.Bit32Required}" Content="{x:Static p:dnSpy_AsmEditor_Resources.SaveModule_Cor20_Flags_Bit32Required}" />
-                                <CheckBox Grid.Row="1" Grid.Column="1" Margin="5 5 0 0" IsThreeState="True" IsChecked="{Binding Cor20HeaderOptions.Bit32Preferred}" Content="{x:Static p:dnSpy_AsmEditor_Resources.SaveModule_Cor20_Flags_Bit32Preferred}" />
-                                <CheckBox Grid.Row="2" Grid.Column="0" Margin="0 5 0 0" IsThreeState="True" IsChecked="{Binding Cor20HeaderOptions.TrackDebugData}" Content="{x:Static p:dnSpy_AsmEditor_Resources.SaveModule_Cor20_Flags_TrackDebugData}" />
-                                <CheckBox Grid.Row="2" Grid.Column="1" Margin="5 5 0 0" IsThreeState="True" IsChecked="{Binding Cor20HeaderOptions.StrongNameSigned}" Content="{x:Static p:dnSpy_AsmEditor_Resources.SaveModule_Cor20_Flags_StrongNameSigned}" />
+                                <CheckBox Grid.Row="0" Grid.Column="0" Margin="0 0 0 0" IsThreeState="True" IsChecked="{Binding Cor20HeaderOptions.ILOnly}" Content="ILOnly" />
+                                <CheckBox Grid.Row="0" Grid.Column="1" Margin="5 0 0 0" IsThreeState="True" IsChecked="{Binding Cor20HeaderOptions.ILLibrary}" Content="ILLibrary" />
+                                <CheckBox Grid.Row="1" Grid.Column="0" Margin="0 5 0 0" IsThreeState="True" IsChecked="{Binding Cor20HeaderOptions.Bit32Required}" Content="32BitRequired" />
+                                <CheckBox Grid.Row="1" Grid.Column="1" Margin="5 5 0 0" IsThreeState="True" IsChecked="{Binding Cor20HeaderOptions.Bit32Preferred}" Content="32BitPreferred" />
+                                <CheckBox Grid.Row="2" Grid.Column="0" Margin="0 5 0 0" IsThreeState="True" IsChecked="{Binding Cor20HeaderOptions.TrackDebugData}" Content="TrackDebugData" />
+                                <CheckBox Grid.Row="2" Grid.Column="1" Margin="5 5 0 0" IsThreeState="True" IsChecked="{Binding Cor20HeaderOptions.StrongNameSigned}" Content="StrongNameSigned" />
                             </Grid>
                         </GroupBox>
                     </StackPanel>
@@ -320,7 +328,7 @@
                                 <ComboBox Grid.Column="3" Margin="5 5 0 0" Name="subsystemComboBox" DisplayMemberPath="Name" ItemsSource="{Binding PEHeadersOptions.Subsystem.Items}" SelectedIndex="{Binding PEHeadersOptions.Subsystem.SelectedIndex}" HorizontalAlignment="Stretch" VerticalContentAlignment="Center" />
                             </Grid>
 
-                            <GroupBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Header="{x:Static p:dnSpy_AsmEditor_Resources.PE_Header_Characteristics}" Margin="0 5 0 0">
+                            <GroupBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Header="Characteristics" Margin="0 5 0 0">
                                 <Grid>
                                     <Grid.RowDefinitions>
                                         <RowDefinition />
@@ -355,7 +363,7 @@
                                 </Grid>
                             </GroupBox>
 
-                            <GroupBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Header="{x:Static p:dnSpy_AsmEditor_Resources.PE_Header_DllCharacteristics}" Margin="0 5 0 0">
+                            <GroupBox Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Header="DllCharacteristics" Margin="0 5 0 0">
                                 <Grid>
                                     <Grid.RowDefinitions>
                                         <RowDefinition />

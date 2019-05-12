@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2018 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -196,8 +196,8 @@ namespace dnSpy.AsmEditor.Compiler.MDEditor {
 				return false;
 			var ac = a.Columns;
 			var bc = b.Columns;
-			Debug.Assert(ac.Count == bc.Count);
-			for (int i = 0; i < ac.Count; i++) {
+			Debug.Assert(ac.Length == bc.Length);
+			for (int i = 0; i < ac.Length; i++) {
 				if (ac[i].Offset != bc[i].Offset)
 					return false;
 			}

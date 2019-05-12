@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2011 AlphaSierraPapa for the SharpDevelop Team
+// Copyright (c) 2011 AlphaSierraPapa for the SharpDevelop Team
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this
 // software and associated documentation files (the "Software"), to deal in the Software
@@ -20,7 +20,7 @@ using System.Collections.Generic;
 using System.Linq;
 using dnlib.DotNet;
 
-#pragma warning disable 1591 // Missing XML comment for publicly visible type or member
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 namespace dnSpy.Contracts.Decompiler {
 	public static class TypesHierarchyHelpers {
 		public static bool IsBaseType(TypeDef baseType, TypeDef derivedType, bool resolveTypeArguments) {
@@ -124,7 +124,7 @@ namespace dnSpy.Contracts.Decompiler {
 			}
 		}
 
-		private static bool MatchMethod(MethodDef mCandidate, MethodSig mCandidateSig, MethodDef mMethod) {
+		private static bool MatchMethod(MethodDef mCandidate, MethodBaseSig mCandidateSig, MethodDef mMethod) {
 			if (mCandidate == null || mCandidateSig == null || mMethod == null)
 				return false;
 
@@ -206,7 +206,7 @@ namespace dnSpy.Contracts.Decompiler {
 			}
 		}
 
-		private static bool MatchProperty(PropertyDef mCandidate, MethodSig mCandidateSig, PropertyDef mProperty) {
+		private static bool MatchProperty(PropertyDef mCandidate, MethodBaseSig mCandidateSig, PropertyDef mProperty) {
 			if (mCandidate == null || mCandidateSig == null || mProperty == null)
 				return false;
 			if (mCandidate.Name != mProperty.Name)
@@ -369,10 +369,10 @@ namespace dnSpy.Contracts.Decompiler {
 			return GenericArgumentResolver.Resolve(type, genericArgs, null);
 		}
 
-		private static MethodSig Resolve(MethodBaseSig method, TypeSig typeContext) {
+		private static MethodBaseSig Resolve(MethodBaseSig method, TypeSig typeContext) {
 			var genericArgs = typeContext is GenericInstSig ? ((GenericInstSig)typeContext).GenericArguments : null;
 			return GenericArgumentResolver.Resolve(method, genericArgs, null);
 		}
 	}
 }
-#pragma warning restore 1591 // Missing XML comment for publicly visible type or member
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member

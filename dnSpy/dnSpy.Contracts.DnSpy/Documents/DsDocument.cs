@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2018 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -20,7 +20,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using dnlib.DotNet;
 using dnlib.PE;
 using dnSpy.Contracts.Utilities;
@@ -133,7 +132,7 @@ namespace dnSpy.Contracts.Documents {
 		/// <inheritdoc/>
 		public override DsDocumentInfo? SerializedDocument => DsDocumentInfo.CreateDocument(Filename);
 		/// <inheritdoc/>
-		public override IDsDocumentNameKey Key => new FilenameKey(Filename);
+		public override IDsDocumentNameKey Key => FilenameKey.CreateFullPath(Filename);
 		/// <inheritdoc/>
 		public override IPEImage PEImage { get; }
 
@@ -177,7 +176,7 @@ namespace dnSpy.Contracts.Documents {
 		/// <inheritdoc/>
 		public override void OnAdded() {
 			if (loadedSymbols)
-				LoadSymbols(ModuleDef.Location);
+				LoadSymbols();
 			base.OnAdded();
 		}
 
@@ -197,9 +196,7 @@ namespace dnSpy.Contracts.Documents {
 			return moduleCtx;
 		}
 
-		void LoadSymbols(string dotNetFilename) {
-			if (!File.Exists(dotNetFilename))
-				return;
+		void LoadSymbols() {
 			// Happens if a module has been removed but then the exact same instance
 			// was re-added.
 			if (ModuleDef.PdbState != null)
@@ -209,9 +206,7 @@ namespace dnSpy.Contracts.Documents {
 			if (m == null)
 				return;
 			try {
-				var pdbFilename = Path.Combine(Path.GetDirectoryName(dotNetFilename), Path.GetFileNameWithoutExtension(dotNetFilename) + ".pdb");
-				// Don't check if the file exists, it could be an embedded portable PDB file
-				m.LoadPdb(pdbFilename);
+				m.LoadPdb();
 			}
 			catch {
 			}
@@ -225,7 +220,7 @@ namespace dnSpy.Contracts.Documents {
 		readonly bool isAsmNode;
 
 		/// <inheritdoc/>
-		public override IDsDocumentNameKey Key => new FilenameKey(Filename);
+		public override IDsDocumentNameKey Key => FilenameKey.CreateFullPath(Filename);
 		/// <inheritdoc/>
 		public override DsDocumentInfo? SerializedDocument => documentInfo;
 		DsDocumentInfo documentInfo;

@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2018 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -71,6 +71,11 @@ namespace dnSpy.Debugger.DotNet.Metadata {
 		/// Compare generic type/method parameter's declaring member
 		/// </summary>
 		CompareGenericParameterDeclaringMember = 0x80,
+
+		/// <summary>
+		/// When comparing types, don't compare a multi-dimensional array's lower bounds and sizes
+		/// </summary>
+		IgnoreMultiDimensionalArrayLowerBoundsAndSizes = 0x100,
 	}
 
 	/// <summary>
@@ -101,6 +106,7 @@ namespace dnSpy.Debugger.DotNet.Metadata {
 		bool CheckTypeEquivalence => (options & DmdSigComparerOptions.CheckTypeEquivalence) != 0;
 		bool CompareCustomModifiers => (options & DmdSigComparerOptions.CompareCustomModifiers) != 0;
 		bool CompareGenericParameterDeclaringMember => (options & DmdSigComparerOptions.CompareGenericParameterDeclaringMember) != 0;
+		bool IgnoreMultiDimensionalArrayLowerBoundsAndSizes => (options & DmdSigComparerOptions.IgnoreMultiDimensionalArrayLowerBoundsAndSizes) != 0;
 
 		/// <summary>
 		/// Constructor
@@ -232,8 +238,9 @@ namespace dnSpy.Debugger.DotNet.Metadata {
 
 				case DmdTypeSignatureKind.MDArray:
 					result = a.GetArrayRank() == b.GetArrayRank() &&
-						Equals(a.GetArraySizes(), b.GetArraySizes()) &&
-						Equals(a.GetArrayLowerBounds(), b.GetArrayLowerBounds()) &&
+						(IgnoreMultiDimensionalArrayLowerBoundsAndSizes ||
+						(Equals(a.GetArraySizes(), b.GetArraySizes()) &&
+						Equals(a.GetArrayLowerBounds(), b.GetArrayLowerBounds()))) &&
 						Equals(a.GetElementType(), b.GetElementType());
 					break;
 
@@ -353,11 +360,16 @@ namespace dnSpy.Debugger.DotNet.Metadata {
 
 			// We do not compare the version number. The runtime can redirect an assembly
 			// reference from a requested version to any other version.
+			// The public key token is also ignored. Only .NET Framwork checks it (.NET Core
+			// and Unity ignore it). We could add a new option to ignore the PKT but it would
+			// require too many changes to the code (they access singleton comparers) and isn't
+			// worth it. It's also being replaced by .NET Core. It's not common for two
+			// assemblies loaded in the same process to have the same assembly name but a
+			// different public key token.
 			const DmdAssemblyNameFlags flagsMask = DmdAssemblyNameFlags.ContentType_Mask;
 			return (a.RawFlags & flagsMask) == (b.RawFlags & flagsMask) &&
 				StringComparer.OrdinalIgnoreCase.Equals(a.Name, b.Name) &&
-				StringComparer.OrdinalIgnoreCase.Equals(a.CultureName ?? string.Empty, b.CultureName ?? string.Empty) &&
-				Impl.AssemblyNameEqualityComparer.PublicKeyTokenEquals(a.GetPublicKeyToken(), b.GetPublicKeyToken());
+				StringComparer.OrdinalIgnoreCase.Equals(a.CultureName ?? string.Empty, b.CultureName ?? string.Empty);
 		}
 
 		/// <summary>
@@ -577,8 +589,10 @@ namespace dnSpy.Debugger.DotNet.Metadata {
 			case DmdTypeSignatureKind.MDArray:
 				hc ^= HASHCODE_MAGIC_ET_ARRAY;
 				hc ^= a.GetArrayRank();
-				hc ^= GetHashCode(a.GetArraySizes());
-				hc ^= GetHashCode(a.GetArrayLowerBounds());
+				if (!IgnoreMultiDimensionalArrayLowerBoundsAndSizes) {
+					hc ^= GetHashCode(a.GetArraySizes());
+					hc ^= GetHashCode(a.GetArrayLowerBounds());
+				}
 				hc ^= GetHashCode(a.GetElementType());
 				break;
 

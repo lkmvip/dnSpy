@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2018 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -41,7 +41,7 @@ namespace dnSpy.Documents.TreeView.Resources {
 			if (er == null)
 				return null;
 
-			var reader = er.GetReader();
+			var reader = er.CreateReader();
 			if (!CouldBeImage(er.Name, ref reader))
 				return null;
 
@@ -128,7 +128,7 @@ namespace dnSpy.Documents.TreeView.Resources {
 
 		public ImageResourceNodeImpl(ITreeNodeGroup treeNodeGroup, EmbeddedResource resource)
 			: base(treeNodeGroup, resource) {
-			imageData = resource.GetReader().ToArray();
+			imageData = resource.CreateReader().ToArray();
 			imageSource = ImageResourceUtilities.CreateImageSource(imageData);
 		}
 

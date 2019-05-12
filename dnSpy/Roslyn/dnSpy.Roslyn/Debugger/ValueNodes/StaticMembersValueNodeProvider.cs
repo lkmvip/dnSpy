@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2018 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -18,13 +18,14 @@
 */
 
 using System;
+using System.Collections.ObjectModel;
 using dnSpy.Contracts.Debugger;
 using dnSpy.Contracts.Debugger.DotNet.Evaluation;
 using dnSpy.Contracts.Debugger.DotNet.Evaluation.ValueNodes;
 using dnSpy.Contracts.Debugger.DotNet.Text;
 using dnSpy.Contracts.Debugger.Engine.Evaluation;
 using dnSpy.Contracts.Debugger.Evaluation;
-using dnSpy.Contracts.Text;
+using dnSpy.Contracts.Debugger.Text;
 using dnSpy.Debugger.DotNet.Metadata;
 
 namespace dnSpy.Roslyn.Debugger.ValueNodes {
@@ -33,19 +34,19 @@ namespace dnSpy.Roslyn.Debugger.ValueNodes {
 
 		readonly DbgDotNetValueNodeProviderFactory valueNodeProviderFactory;
 
-		public StaticMembersValueNodeProvider(DbgDotNetValueNodeProviderFactory valueNodeProviderFactory, LanguageValueNodeFactory valueNodeFactory, in DbgDotNetText name, string expression, in MemberValueNodeInfoCollection membersCollection, DbgValueNodeEvaluationOptions evalOptions)
+		public StaticMembersValueNodeProvider(DbgDotNetValueNodeProviderFactory valueNodeProviderFactory, LanguageValueNodeFactory valueNodeFactory, DbgDotNetText name, string expression, MemberValueNodeInfoCollection membersCollection, DbgValueNodeEvaluationOptions evalOptions)
 			: base(valueNodeFactory, name, expression, membersCollection, evalOptions) {
 			this.valueNodeProviderFactory = valueNodeProviderFactory;
 		}
 
 		string GetExpression(DmdType declaringType) {
 			var sb = ObjectCache.AllocStringBuilder();
-			var output = new StringBuilderTextColorOutput(sb);
+			var output = new DbgStringBuilderTextWriter(sb);
 			valueNodeProviderFactory.FormatTypeName2(output, declaringType);
 			return ObjectCache.FreeAndToString(ref sb);
 		}
 
-		protected override (DbgDotNetValueNode node, bool canHide) CreateValueNode(DbgEvaluationInfo evalInfo, int index, DbgValueNodeEvaluationOptions options) {
+		protected override (DbgDotNetValueNode node, bool canHide) CreateValueNode(DbgEvaluationInfo evalInfo, int index, DbgValueNodeEvaluationOptions options, ReadOnlyCollection<string> formatSpecifiers) {
 			var runtime = evalInfo.Runtime.GetDotNetRuntime();
 			DbgDotNetValueResult valueResult = default;
 			try {
@@ -90,9 +91,9 @@ namespace dnSpy.Roslyn.Debugger.ValueNodes {
 				if (valueResult.HasError)
 					newNode = valueNodeFactory.CreateError(evalInfo, info.Name, valueResult.ErrorMessage, expression, false);
 				else if (valueResult.ValueIsException)
-					newNode = valueNodeFactory.Create(evalInfo, info.Name, valueResult.Value, null, options, expression, PredefinedDbgValueNodeImageNames.Error, true, false, expectedType, false);
+					newNode = valueNodeFactory.Create(evalInfo, info.Name, valueResult.Value, formatSpecifiers, options, expression, PredefinedDbgValueNodeImageNames.Error, true, false, expectedType, false);
 				else
-					newNode = valueNodeFactory.Create(evalInfo, info.Name, valueResult.Value, null, options, expression, imageName, isReadOnly, false, expectedType, false);
+					newNode = valueNodeFactory.Create(evalInfo, info.Name, valueResult.Value, formatSpecifiers, options, expression, imageName, isReadOnly, false, expectedType, false);
 
 				valueResult = default;
 				return (newNode, true);

@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2018 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -61,14 +61,14 @@ namespace dnSpy.Contracts.Debugger.Engine {
 		/// <summary>
 		/// Gets the process id
 		/// </summary>
-		public ulong ProcessId { get; }
+		public int ProcessId { get; }
 
 		/// <summary>
 		/// Constructor
 		/// </summary>
 		/// <param name="processId">Process id</param>
 		/// <param name="messageFlags">Message flags</param>
-		public DbgMessageConnected(ulong processId, DbgEngineMessageFlags messageFlags) : base(messageFlags) => ProcessId = processId;
+		public DbgMessageConnected(int processId, DbgEngineMessageFlags messageFlags) : base(messageFlags) => ProcessId = processId;
 
 		/// <summary>
 		/// Constructor

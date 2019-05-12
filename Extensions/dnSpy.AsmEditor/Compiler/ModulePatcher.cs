@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2018 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -65,7 +65,7 @@ namespace dnSpy.AsmEditor.Compiler {
 						new MDWriter(moduleData, mdEditor, stream).Write();
 						NativeMemoryRawModuleBytes newRawData = null;
 						try {
-							newRawData = new NativeMemoryRawModuleBytes((int)stream.Length);
+							newRawData = new NativeMemoryRawModuleBytes((int)stream.Length, isFileLayout: true);
 							stream.CopyTo((IntPtr)newRawData.Pointer, newRawData.Size);
 							moduleData = newRawData;
 						}

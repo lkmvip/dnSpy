@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2018 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -29,11 +29,11 @@ using System.Reflection;
 using System.Security;
 using System.Text;
 using dnlib.DotNet;
+using dnSpy.Console.Properties;
 using dnSpy.Contracts.Decompiler;
 using dnSpy.Contracts.Text;
 using dnSpy.Contracts.Utilities;
 using dnSpy.Decompiler.MSBuild;
-using dnSpy_Console.Properties;
 
 namespace dnSpy_Console {
 	[Serializable]
@@ -199,7 +199,7 @@ namespace dnSpy_Console {
 			userGacPaths = new List<string>();
 			gacFiles = new List<string>();
 			decompilationContext = new DecompilationContext();
-			moduleContext = ModuleDef.CreateModuleContext(false); // Same as dnSpy.exe
+			moduleContext = ModuleDef.CreateModuleContext(); // Same as dnSpy.exe
 			assemblyResolver = (AssemblyResolver)moduleContext.AssemblyResolver;
 			assemblyResolver.EnableFrameworkRedirect = false; // Same as dnSpy.exe
 			assemblyResolver.FindExactMatch = true; // Same as dnSpy.exe
@@ -762,10 +762,10 @@ namespace dnSpy_Console {
 			return module.GetTypes().FirstOrDefault(a => {
 				sb.Clear();
 				string s1, s2;
-				if (comparer.Equals(s1 = FullNameCreator.FullName(a, false, null, sb), name))
+				if (comparer.Equals(s1 = FullNameFactory.FullName(a, false, null, sb), name))
 					return true;
 				sb.Clear();
-				if (comparer.Equals(s2 = FullNameCreator.FullName(a, true, null, sb), name))
+				if (comparer.Equals(s2 = FullNameFactory.FullName(a, true, null, sb), name))
 					return true;
 				sb.Clear();
 				if (comparer.Equals(CleanTypeName(s1), name))
@@ -780,10 +780,10 @@ namespace dnSpy_Console {
 			return module.GetTypes().FirstOrDefault(a => {
 				sb.Clear();
 				string s1, s2;
-				if (comparer.Equals(s1 = FullNameCreator.Name(a, false, sb), name))
+				if (comparer.Equals(s1 = FullNameFactory.Name(a, false, sb), name))
 					return true;
 				sb.Clear();
-				if (comparer.Equals(s2 = FullNameCreator.Name(a, true, sb), name))
+				if (comparer.Equals(s2 = FullNameFactory.Name(a, true, sb), name))
 					return true;
 				sb.Clear();
 				if (comparer.Equals(CleanTypeName(s1), name))

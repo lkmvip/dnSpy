@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2018 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -47,7 +47,7 @@ namespace dnSpy.Decompiler.MSBuild {
 			if (dir.Data.Count == 0)
 				return null;
 
-			var reader = dir.Data[0].GetReader();
+			var reader = dir.Data[0].CreateReader();
 			return new ApplicationManifest(filenameCreator.CreateName("app.manifest"), ref reader);
 		}
 

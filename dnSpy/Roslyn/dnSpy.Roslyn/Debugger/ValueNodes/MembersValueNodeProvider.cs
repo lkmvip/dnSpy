@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2018 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -19,6 +19,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
@@ -28,7 +29,7 @@ using dnSpy.Contracts.Debugger.DotNet.Evaluation.ValueNodes;
 using dnSpy.Contracts.Debugger.DotNet.Text;
 using dnSpy.Contracts.Debugger.Engine.Evaluation;
 using dnSpy.Contracts.Debugger.Evaluation;
-using dnSpy.Contracts.Text;
+using dnSpy.Contracts.Debugger.Text;
 using dnSpy.Debugger.DotNet.Metadata;
 using dnSpy.Roslyn.Properties;
 
@@ -81,7 +82,7 @@ namespace dnSpy.Roslyn.Debugger.ValueNodes {
 			}
 		}
 
-		protected MembersValueNodeProvider(LanguageValueNodeFactory valueNodeFactory, in DbgDotNetText name, string expression, in MemberValueNodeInfoCollection membersCollection, DbgValueNodeEvaluationOptions evalOptions) {
+		protected MembersValueNodeProvider(LanguageValueNodeFactory valueNodeFactory, DbgDotNetText name, string expression, MemberValueNodeInfoCollection membersCollection, DbgValueNodeEvaluationOptions evalOptions) {
 			this.valueNodeFactory = valueNodeFactory;
 			Name = name;
 			Expression = expression;
@@ -111,7 +112,7 @@ namespace dnSpy.Roslyn.Debugger.ValueNodes {
 			dbgManager = evalInfo.Runtime.Process.DbgManager;
 			if (errorMessage != null)
 				childNodeProviderInfos = new ChildNodeProviderInfo[] { new ChildNodeProviderInfo(0, 1, 0) };
-			else if ((evalOptions & DbgValueNodeEvaluationOptions.NoHideRoots) != 0 || !membersCollection.HasHideRoot || membersCollection.Members.Length == 0)
+			else if ((evalOptions & DbgValueNodeEvaluationOptions.NoHideRoots) != 0 || !membersCollection.HasHideRoot || (evalOptions & DbgValueNodeEvaluationOptions.RawView) != 0 || membersCollection.Members.Length == 0)
 				childNodeProviderInfos = new ChildNodeProviderInfo[] { new ChildNodeProviderInfo(0, (uint)membersCollection.Members.Length, 0) };
 			else {
 				DbgDotNetValueNode valueNode = null;
@@ -131,7 +132,8 @@ namespace dnSpy.Roslyn.Debugger.ValueNodes {
 						}
 
 						evalInfo.CancellationToken.ThrowIfCancellationRequested();
-						var info = CreateValueNode(evalInfo, membersBaseIndex, evalOptions);
+						// Format specifiers get updated in GetChildren()
+						var info = CreateValueNode(evalInfo, membersBaseIndex, evalOptions, formatSpecifiers: null);
 						valueNode = info.node;
 						ulong childCount = info.canHide ? valueNode.GetChildCount(evalInfo) : 1;
 						list.Add(new ChildNodeProviderInfo(baseIndex, baseIndex + childCount, valueNode, info.canHide));
@@ -156,9 +158,9 @@ namespace dnSpy.Roslyn.Debugger.ValueNodes {
 			hasInitialized = true;
 		}
 
-		protected abstract (DbgDotNetValueNode node, bool canHide) CreateValueNode(DbgEvaluationInfo evalInfo, int index, DbgValueNodeEvaluationOptions options);
+		protected abstract (DbgDotNetValueNode node, bool canHide) CreateValueNode(DbgEvaluationInfo evalInfo, int index, DbgValueNodeEvaluationOptions options, ReadOnlyCollection<string> formatSpecifiers);
 
-		protected (DbgDotNetValueNode node, bool canHide) CreateValueNode(DbgEvaluationInfo evalInfo, bool addParens, DmdType slotType, DbgDotNetValue value, int index, DbgValueNodeEvaluationOptions options, string baseExpression) {
+		protected (DbgDotNetValueNode node, bool canHide) CreateValueNode(DbgEvaluationInfo evalInfo, bool addParens, DmdType slotType, DbgDotNetValue value, int index, DbgValueNodeEvaluationOptions options, string baseExpression, ReadOnlyCollection<string> formatSpecifiers) {
 			var runtime = evalInfo.Runtime.GetDotNetRuntime();
 			if ((evalOptions & DbgValueNodeEvaluationOptions.RawView) != 0)
 				options |= DbgValueNodeEvaluationOptions.RawView;
@@ -211,9 +213,9 @@ namespace dnSpy.Roslyn.Debugger.ValueNodes {
 					canHide = false;
 				}
 				else if (valueResult.ValueIsException)
-					newNode = valueNodeFactory.Create(evalInfo, info.Name, valueResult.Value, null, options, expression, PredefinedDbgValueNodeImageNames.Error, true, false, expectedType, false);
+					newNode = valueNodeFactory.Create(evalInfo, info.Name, valueResult.Value, formatSpecifiers, options, expression, PredefinedDbgValueNodeImageNames.Error, true, false, expectedType, false);
 				else
-					newNode = valueNodeFactory.Create(evalInfo, info.Name, valueResult.Value, null, options, expression, imageName, isReadOnly, false, expectedType, false);
+					newNode = valueNodeFactory.Create(evalInfo, info.Name, valueResult.Value, formatSpecifiers, options, expression, imageName, isReadOnly, false, expectedType, false);
 
 				valueResult = default;
 				return (newNode, canHide);
@@ -242,7 +244,7 @@ namespace dnSpy.Roslyn.Debugger.ValueNodes {
 			}
 		}
 
-		protected virtual (DbgDotNetValueNode node, bool canHide) TryCreateInstanceValueNode(DbgEvaluationInfo evalInfo, in DbgDotNetValueResult valueResult) => (null, false);
+		protected virtual (DbgDotNetValueNode node, bool canHide) TryCreateInstanceValueNode(DbgEvaluationInfo evalInfo, DbgDotNetValueResult valueResult) => (null, false);
 
 		int lastProviderIndex;
 		int GetProviderIndex(ulong childIndex) {
@@ -266,12 +268,12 @@ namespace dnSpy.Roslyn.Debugger.ValueNodes {
 			return lastProviderIndex = lo;
 		}
 
-		public sealed override DbgDotNetValueNode[] GetChildren(LanguageValueNodeFactory valueNodeFactory, DbgEvaluationInfo evalInfo, ulong index, int count, DbgValueNodeEvaluationOptions options) {
+		public sealed override DbgDotNetValueNode[] GetChildren(LanguageValueNodeFactory valueNodeFactory, DbgEvaluationInfo evalInfo, ulong index, int count, DbgValueNodeEvaluationOptions options, ReadOnlyCollection<string> formatSpecifiers) {
 			Debug.Assert(this.valueNodeFactory == valueNodeFactory);
 			if (!hasInitialized)
 				Initialize(evalInfo);
 			if (realProvider != null)
-				return realProvider.GetChildren(valueNodeFactory, evalInfo, index, count, options);
+				return realProvider.GetChildren(valueNodeFactory, evalInfo, index, count, options, formatSpecifiers);
 			DbgDotNetValueNode[] children = null;
 			var res = count == 0 ? Array.Empty<DbgDotNetValueNode>() : new DbgDotNetValueNode[count];
 			try {
@@ -281,12 +283,16 @@ namespace dnSpy.Roslyn.Debugger.ValueNodes {
 					evalInfo.CancellationToken.ThrowIfCancellationRequested();
 					ref readonly var providerInfo = ref childNodeProviderInfos[providerIndex];
 					if (providerInfo.ValueNode != null) {
+						UpdateFormatSpecifiers(providerInfo.ValueNode, formatSpecifiers);
 						if (providerInfo.CanHide) {
 							ulong childCount = providerInfo.EndIndex - providerInfo.StartIndex;
 							int maxChildren = (int)Math.Min(childCount, (uint)(count - i));
 							children = providerInfo.ValueNode.GetChildren(evalInfo, index + (uint)i - providerInfo.StartIndex, maxChildren, options);
-							for (int j = 0; j < children.Length; j++)
-								res[i++] = children[j];
+							for (int j = 0; j < children.Length; j++) {
+								var child = children[j];
+								UpdateFormatSpecifiers(child, formatSpecifiers);
+								res[i++] = child;
+							}
 							children = null;
 						}
 						else
@@ -297,7 +303,7 @@ namespace dnSpy.Roslyn.Debugger.ValueNodes {
 							evalInfo.CancellationToken.ThrowIfCancellationRequested();
 							res[i] = errorMessage != null ?
 								valueNodeFactory.CreateError(evalInfo, errorPropertyName, errorMessage, Expression, false) :
-								CreateValueNode(evalInfo, (int)(index + (uint)i - providerInfo.StartIndex + providerInfo.BaseIndex), options).node;
+								CreateValueNode(evalInfo, (int)(index + (uint)i - providerInfo.StartIndex + providerInfo.BaseIndex), options, formatSpecifiers).node;
 							i++;
 						}
 					}
@@ -311,7 +317,10 @@ namespace dnSpy.Roslyn.Debugger.ValueNodes {
 			}
 			return res;
 		}
-		static readonly DbgDotNetText errorPropertyName = new DbgDotNetText(new DbgDotNetTextPart(BoxedTextColor.InstanceProperty, dnSpy_Roslyn_Resources.DebuggerVarsWindow_Error_PropertyName));
+		static readonly DbgDotNetText errorPropertyName = new DbgDotNetText(new DbgDotNetTextPart(DbgTextColor.InstanceProperty, dnSpy_Roslyn_Resources.DebuggerVarsWindow_Error_PropertyName));
+
+		void UpdateFormatSpecifiers(DbgDotNetValueNode valueNode, ReadOnlyCollection<string> formatSpecifiers) =>
+			(valueNode as DbgDotNetValueNodeImpl)?.SetFormatSpecifiers(formatSpecifiers);
 
 		protected virtual void DisposeCore() { }
 

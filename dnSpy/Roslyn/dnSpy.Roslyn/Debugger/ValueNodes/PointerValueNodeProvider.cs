@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2018 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -18,6 +18,7 @@
 */
 
 using System;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using dnSpy.Contracts.Debugger;
 using dnSpy.Contracts.Debugger.DotNet.Evaluation;
@@ -57,7 +58,7 @@ namespace dnSpy.Roslyn.Debugger.ValueNodes {
 			return derefValue != null ? 1UL : 0;
 		}
 
-		public override DbgDotNetValueNode[] GetChildren(LanguageValueNodeFactory valueNodeFactory, DbgEvaluationInfo evalInfo, ulong index, int count, DbgValueNodeEvaluationOptions options) {
+		public override DbgDotNetValueNode[] GetChildren(LanguageValueNodeFactory valueNodeFactory, DbgEvaluationInfo evalInfo, ulong index, int count, DbgValueNodeEvaluationOptions options, ReadOnlyCollection<string> formatSpecifiers) {
 			if (derefValue == null)
 				return Array.Empty<DbgDotNetValueNode>();
 			var derefExpr = valueNodeProviderFactory.GetDereferenceExpression(Expression);
@@ -68,7 +69,7 @@ namespace dnSpy.Roslyn.Debugger.ValueNodes {
 			if (res.ErrorMessage != null)
 				valueNode = valueNodeFactory.CreateError(evalInfo, DbgDotNetText.Empty, res.ErrorMessage, derefExpr, false);
 			else
-				valueNode = valueNodeFactory.Create(res.Provider, derefName, nodeInfo, derefExpr, PredefinedDbgValueNodeImageNames.DereferencedPointer, false, false, value.Type.GetElementType(), derefValue.Type, null, default, null);
+				valueNode = valueNodeFactory.Create(res.Provider, derefName, nodeInfo, derefExpr, PredefinedDbgValueNodeImageNames.DereferencedPointer, false, false, value.Type.GetElementType(), derefValue.Type, null, default, formatSpecifiers);
 			return new[] { valueNode };
 		}
 

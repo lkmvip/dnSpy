@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2018 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -18,6 +18,7 @@
 */
 
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using dnSpy.Contracts.Debugger.DotNet.Evaluation.ValueNodes;
 using dnSpy.Contracts.Debugger.DotNet.Text;
 using dnSpy.Contracts.Debugger.Evaluation;
@@ -32,7 +33,7 @@ namespace dnSpy.Roslyn.Debugger.ValueNodes {
 
 		public abstract bool? HasChildren { get; }
 		public abstract ulong GetChildCount(DbgEvaluationInfo evalInfo);
-		public abstract DbgDotNetValueNode[] GetChildren(LanguageValueNodeFactory valueNodeFactory, DbgEvaluationInfo evalInfo, ulong index, int count, DbgValueNodeEvaluationOptions options);
+		public abstract DbgDotNetValueNode[] GetChildren(LanguageValueNodeFactory valueNodeFactory, DbgEvaluationInfo evalInfo, ulong index, int count, DbgValueNodeEvaluationOptions options, ReadOnlyCollection<string> formatSpecifiers);
 
 		public abstract void Dispose();
 

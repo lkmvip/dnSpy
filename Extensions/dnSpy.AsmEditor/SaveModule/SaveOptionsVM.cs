@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2018 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -25,6 +25,8 @@ namespace dnSpy.AsmEditor.SaveModule {
 	abstract class SaveOptionsVM : ViewModelBase {
 		public abstract SaveOptionsType Type { get; }
 		public abstract object UndoDocument { get; }
+
+		public string OriginalFileName { get; set; }
 
 		public string FileName {
 			get => filename;

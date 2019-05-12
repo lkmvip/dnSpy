@@ -223,7 +223,7 @@
     <value>运行环境不支持设置新语句</value>
   </data>
   <data name="AttachToProcessXCommand" xml:space="preserve">
-    <value>附加到进程 ({0})...</value>
+    <value>附加到进程 ({0})(_A)...</value>
   </data>
   <data name="UnityEditor" xml:space="preserve">
     <value>编辑器</value>
@@ -247,6 +247,6 @@
     <value>仅可用于Debug编译的Unity进程</value>
   </data>
   <data name="DebuggingUnityGamesText" xml:space="preserve">
-    <value>Debugging Unity Games</value>
+    <value>调试 Unity 游戏</value>
   </data>
 </root>

@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2018 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -17,6 +17,7 @@
     along with dnSpy.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+using System.Collections.ObjectModel;
 using dnSpy.Contracts.Debugger.DotNet.Evaluation;
 using dnSpy.Contracts.Debugger.DotNet.Evaluation.ValueNodes;
 using dnSpy.Contracts.Debugger.DotNet.Text;
@@ -32,7 +33,7 @@ namespace dnSpy.Roslyn.Debugger.ValueNodes {
 		readonly DbgDotNetValue value;
 		readonly string imageName;
 
-		public InstanceMembersValueNodeProvider(LanguageValueNodeFactory valueNodeFactory, in DbgDotNetText name, string expression, bool addParens, DmdType slotType, DbgDotNetValue value, in MemberValueNodeInfoCollection membersCollection, DbgValueNodeEvaluationOptions evalOptions, string imageName)
+		public InstanceMembersValueNodeProvider(LanguageValueNodeFactory valueNodeFactory, DbgDotNetText name, string expression, bool addParens, DmdType slotType, DbgDotNetValue value, MemberValueNodeInfoCollection membersCollection, DbgValueNodeEvaluationOptions evalOptions, string imageName)
 			: base(valueNodeFactory, name, expression, membersCollection, evalOptions) {
 			this.addParens = addParens;
 			this.slotType = slotType;
@@ -40,7 +41,7 @@ namespace dnSpy.Roslyn.Debugger.ValueNodes {
 			this.imageName = imageName;
 		}
 
-		protected override (DbgDotNetValueNode node, bool canHide) CreateValueNode(DbgEvaluationInfo evalInfo, int index, DbgValueNodeEvaluationOptions options) =>
-			CreateValueNode(evalInfo, addParens, slotType, value, index, options, Expression);
+		protected override (DbgDotNetValueNode node, bool canHide) CreateValueNode(DbgEvaluationInfo evalInfo, int index, DbgValueNodeEvaluationOptions options, ReadOnlyCollection<string> formatSpecifiers) =>
+			CreateValueNode(evalInfo, addParens, slotType, value, index, options, Expression, formatSpecifiers);
 	}
 }

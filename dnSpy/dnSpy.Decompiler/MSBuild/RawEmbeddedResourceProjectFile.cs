@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2018 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -37,7 +37,7 @@ namespace dnSpy.Decompiler.MSBuild {
 
 		public override void Create(DecompileContext ctx) {
 			using (var stream = File.Create(Filename))
-				embeddedResource.GetReader().CopyTo(stream);
+				embeddedResource.CreateReader().CopyTo(stream);
 		}
 	}
 }

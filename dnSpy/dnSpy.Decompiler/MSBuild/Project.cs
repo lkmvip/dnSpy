@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2018 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -137,7 +137,7 @@ namespace dnSpy.Decompiler.MSBuild {
 
 			var existingAppConfig = Options.Module.Location + ".config";
 			if (File.Exists(existingAppConfig))
-				Files.Add(new AppConfigProjectFile(filenameCreator.CreateName("App.config"), existingAppConfig));
+				Files.Add(new AppConfigProjectFile(filenameCreator.CreateName("app.config"), existingAppConfig));
 
 			applicationIcon = ApplicationIcon.TryCreate(Options.Module.Win32Resources, Path.GetFileName(Directory), filenameCreator);
 
@@ -360,7 +360,7 @@ namespace dnSpy.Decompiler.MSBuild {
 				yield break;
 			}
 
-			if (ResourceReader.CouldBeResourcesFile(er.GetReader())) {
+			if (ResourceReader.CouldBeResourcesFile(er.CreateReader())) {
 				var files = TryCreateResourceFiles(module, resourceNameCreator, er);
 				if (files != null) {
 					foreach (var file in files)
@@ -375,7 +375,7 @@ namespace dnSpy.Decompiler.MSBuild {
 		List<ProjectFile> TryCreateResourceFiles(ModuleDef module, ResourceNameCreator resourceNameCreator, EmbeddedResource er) {
 			ResourceElementSet set;
 			try {
-				set = ResourceReader.Read(module, er.GetReader());
+				set = ResourceReader.Read(module, er.CreateReader());
 			}
 			catch {
 				return null;
@@ -491,10 +491,10 @@ namespace dnSpy.Decompiler.MSBuild {
 		static ResourceElementSet TryCreateResourceElementSet(ModuleDef module, EmbeddedResource er) {
 			if (er == null)
 				return null;
-			if (!ResourceReader.CouldBeResourcesFile(er.GetReader()))
+			if (!ResourceReader.CouldBeResourcesFile(er.CreateReader()))
 				return null;
 			try {
-				return ResourceReader.Read(module, er.GetReader());
+				return ResourceReader.Read(module, er.CreateReader());
 			}
 			catch {
 				return null;

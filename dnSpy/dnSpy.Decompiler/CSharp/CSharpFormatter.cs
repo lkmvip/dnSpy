@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2018 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -884,7 +884,7 @@ namespace dnSpy.Decompiler.CSharp {
 					type = type.Next;
 				}
 				if (list != null) {
-					Write(list[list.Count - 1].Next, typeGenArgs, methGenArgs);
+					Write(list[list.Count - 1].Next, typeGenArgs, Array.Empty<TypeSig>());
 					foreach (var aryType in list) {
 						if (aryType.ElementType == ElementType.Array) {
 							OutputWrite(ArrayParenOpen, BoxedTextColor.Punctuation);
@@ -976,7 +976,7 @@ namespace dnSpy.Decompiler.CSharp {
 				case ElementType.GenericInst:
 					var gis = (GenericInstSig)type;
 					if (TypeFormatterUtils.IsSystemNullable(gis)) {
-						Write(gis.GenericArguments[0], typeGenArgs, methGenArgs);
+						Write(GenericArgumentResolver.Resolve(gis.GenericArguments[0], typeGenArgs, methGenArgs), null, null);
 						OutputWrite("?", BoxedTextColor.Operator);
 					}
 					else if (TypeFormatterUtils.IsSystemValueTuple(gis)) {
@@ -987,7 +987,7 @@ namespace dnSpy.Decompiler.CSharp {
 								if (needComma)
 									WriteCommaSpace();
 								needComma = true;
-								Write(gis.GenericArguments[j], typeGenArgs, methGenArgs);
+								Write(GenericArgumentResolver.Resolve(gis.GenericArguments[j], typeGenArgs, methGenArgs), null, null);
 							}
 							if (gis.GenericArguments.Count != 8)
 								break;
@@ -1000,12 +1000,12 @@ namespace dnSpy.Decompiler.CSharp {
 						OutputWrite(TupleParenClose, BoxedTextColor.Punctuation);
 					}
 					else {
-						Write(gis.GenericType, typeGenArgs, methGenArgs);
+						Write(gis.GenericType, null, null);
 						OutputWrite(GenericParenOpen, BoxedTextColor.Punctuation);
 						for (int i = 0; i < gis.GenericArguments.Count; i++) {
 							if (i > 0)
 								WriteCommaSpace();
-							Write(gis.GenericArguments[i], typeGenArgs, methGenArgs);
+							Write(GenericArgumentResolver.Resolve(gis.GenericArguments[i], typeGenArgs, methGenArgs), null, null);
 						}
 						OutputWrite(GenericParenClose, BoxedTextColor.Punctuation);
 					}

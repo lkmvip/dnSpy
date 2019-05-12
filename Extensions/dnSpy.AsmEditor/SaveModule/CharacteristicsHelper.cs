@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2014-2018 de4dot@gmail.com
+/*
+    Copyright (C) 2014-2019 de4dot@gmail.com
 
     This file is part of dnSpy
 
@@ -31,7 +31,7 @@ namespace dnSpy.AsmEditor.SaveModule {
 		}
 
 		public static Characteristics GetCharacteristics(Characteristics characteristics, Machine machine) {
-			if (machine == Machine.IA64 || machine == Machine.AMD64 || machine == Machine.ARM64) {
+			if (machine.Is64Bit()) {
 				characteristics &= ~Characteristics.Bit32Machine;
 				characteristics |= Characteristics.LargeAddressAware;
 			}
